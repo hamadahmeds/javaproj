@@ -1,0 +1,19 @@
+{
+  "name": "pkgdemo",
+  "version": "1.0.0",
+  "description": "kpgdemo for first project ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brendenwest/it122.git"
+  },
+  "author": "same author",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brendenwest/it122/issues"
+  },
+  "homepage": "https://github.com/brendenwest/it122#readme"
+}
