@@ -1,48 +1,50 @@
-console.log('Wellcome The Server is Runing!!');
-
-
-var express = require('express')
-var app = express()
-
-
-
-const http = require("http");
-
-const fs = require("fs");  // file sysem inside node.js
 const data = require('./data'); // files you crea
 
-http.createServer((req,res) => {
 
-    var path = req.url.toLowerCase();
-    const parse = require("querystring").parse
-    let url = req.url.split("?");  // separate route from query string
-    let query = parse(url[1]); // convert query string to a JS object
-     console.log(query)
+var express = require('express');
+var app = express();
 
-    switch(url[0]) {
 
-        case '/':
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            
-            res.end(JSON.stringify(data.getAll()));
-            break;
-        case '/detail':
+import express from 'express';
 
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            
-            res.end(JSON.stringify(data.getItem(7676)));
-            break;
-        case '/about':
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.send(JSON.stringify());
-            
-        
-            break;
-        default:
-            res.writeHead(404, {'Content-Type': 'text/plain'});
-            res.end('Not found');
-            break;
-        }
-    }).listen(process.env.PORT || 3000);
+const app = express(); // instance of express applicatoin 
+
+app.set('port', process.env.PORT || 3000);
+app.use(express.static('./public')); // set location for static files
+
+
+app.use(express.urlencoded()); //Parse URL-encoded bodies/ use to submit js objects
+app.use(express.json()); /// use to submit info as a  js objects
+
+app.engine('hbs', handlebars({defaultLayout: false}));
+app.set("view engine", "hbs");
+
+
+//  ROUT   send static file as response
+
+app.get('/', (req,res) => {
+    res.type('text/html');
+    res.sendFile('./public/home.html');
+
+    res.render('data',{data: data.getAll()})
     
-////
+   });
+   
+   // send plain text response
+   app.get('/about', (req,res) => {
+
+    res.end(JSON.stringify(data.getAll()));
+
+    res.type('text/plain');
+    res.send('About page');
+
+    res.end(JSON.stringify(data.getItem(7676)));
+    
+   });
+   
+   // define 404 handler
+   app.use((req,res) => {
+    res.type('text/plain');
+    res.status(404);
+    res.send('404 - Not found');
+   });
