@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "kpgdemo for first project ",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/brendenwest/it122.git"
@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/brendenwest/it122/issues"
   },
-  "homepage": "https://github.com/brendenwest/it122#readme"
+  "homepage": "https://github.com/brendenwest/it122#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^5.3.2"
+  }
 }
