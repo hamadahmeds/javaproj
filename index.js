@@ -2,10 +2,14 @@
 "use strict"; 
 // const fs = require("fs");  // file sysem inside node.js
 
-import * as car from "./data.js"; 
+// import * as car from "./data.js"; 
+
+import{ Cars } from "./models/car.js"
 
 // var express = require('express');
 import express from "express";
+
+import cors from "cors";
 import handlebars from "express-handlebars";
 
 
@@ -15,35 +19,77 @@ app.use(express.static('./public')); // set location for static files
 app.use(express.urlencoded()); //Parse URL-encoded bodiesarse URL-encoded bodies/ use to submit js objects
 app.use(express.json()); /// use to submit info as a  js objects
 
+app.use(cors()); // set Access-Control-Allow-Origin header for api route
+
+
+
+
 app.engine('hbs', handlebars({defaultLayout: "main.hbs"}));
 app.set("view engine", "hbs");
 
-app.get('/', (req,res) => {
 
-   res.render('home', {cars: car.getAll()});
+app.get('/', (_req, res, next ) => {
+   Cars.find({}).lean()
+   .then((car) => {
+       // respond to browser only after db query completes
+      res.render('home', { car });
+      
+})
+.catch(err => next(err))
+});
+
+
+//    // send plain text response// 
+
+app.get('/about', (_req,res) => {
+   res.type('text/plain');
+   res.send("about page ");
+   // res.send(JSON.stringify(car.getAll()));
+});
+
+// app.get("/detail", (req , res) => {
+//    console.log(req.query);
+//    let result = car.getItem(req.query.model);
+//    res.render('detail', {model: req.query.model, result});
+
+// });
+
+app.get('/detail', (req,res,next) => {
+   // db query can use request parameters
+   Cars.findOne({ model:req.query.model}).lean()
+      .then((car) => {
+         res.render('detail', {result: car} );
+   })
+      .catch(err => next(err));
    });
 
-   // send plain text response
-app.get('/about', (req,res) => {
-   res.type('text/plain');
-
-   res.send(JSON.stringify(car.getAll()));
-});
-
-app.get("/detail", (req , res) => {
-   console.log(req.query);
-   let result = car.getItem(req.query.model);
-   res.render('detail', {model: req.query.model, result});
-
-});
 
 
-   app.use((req,res) => {
+   app.post('/detail', (req,res, next) => {
+      Cars.findOne({ model:req.body.model }).lean()
+         .then((car) => {
+         res.render('detail', {result: car });
+         })
+         .catch(err => next(err));
+   });
+
+   app.get('/delete', (req,res) => {
+      Cars.remove({ model:req.query.model }, (err, result) => {
+      if (err) return next(err);
+      let deleted = result.result !== 0; // n will be 0 if no docs deleted
+      Cars.count((err, total) => {
+            res.type('text/plain');
+            res.render('delete', {model: req.query.model, deleted: result.result.n !== 0, total: total } );    
+      });
+      });
+   });
+
+
+   app.use((_req,res) => {
    res.type('text/plain');
    res.status(404);
    res.send('404 - Not found');
    });
-
 
 
 
