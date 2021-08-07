@@ -1,19 +1,19 @@
+"use strict";
 
-"use strict"; 
-// const fs = require("fs");  // file sysem inside node.js
 
-// import * as car from "./data.js"; 
+import { Cars } from "./models/car.js";
 
-import{ Cars } from "./models/car.js"
-
-// var express = require('express');
 import express from "express";
 
-import cors from "cors";
+// import express , { response } from "express";
+
+import cors from 'cors';
 import handlebars from "express-handlebars";
 
+// import { model } from "mongoose";
 
-const app = express(); // instance of express applicatoin 
+
+const app = express(); // instance of express applicatoin
 app.set('port', process.env.PORT || 3000);
 app.use(express.static('./public')); // set location for static files
 app.use(express.urlencoded()); //Parse URL-encoded bodiesarse URL-encoded bodies/ use to submit js objects
@@ -21,81 +21,95 @@ app.use(express.json()); /// use to submit info as a  js objects
 
 app.use(cors()); // set Access-Control-Allow-Origin header for api route
 
+app.use('/api', cors());
+
+app.engine('hbs', handlebars({ defaultLayout: 'main.hbs' }));
+app.set('view engine', 'hbs');
 
 
 
-app.engine('hbs', handlebars({defaultLayout: "main.hbs"}));
-app.set("view engine", "hbs");
-
-
-app.get('/', (_req, res, next ) => {
-   Cars.find({}).lean()
-   .then((car) => {
-       // respond to browser only after db query completes
-      res.render('home', { car });
-      
-})
-.catch(err => next(err))
+app.get('/', (req, res, next) => {
+  Cars.find({}).lean().then((car) => {
+      // respond to browser only after db query completes
+      res.render("home", { car });
+    })
+    .catch((err) => next(err));
 });
 
+//    // send plain text response//
 
-//    // send plain text response// 
-
-app.get('/about', (_req,res) => {
-   res.type('text/plain');
-   res.send("about page ");
-   // res.send(JSON.stringify(car.getAll()));
+app.get('/about', (req, res) => {
+  res.type("text/plain");
+  res.send("about page ");
+  // res.send(JSON.stringify(car.getAll()));
 });
 
-// app.get("/detail", (req , res) => {
-//    console.log(req.query);
-//    let result = car.getItem(req.query.model);
-//    res.render('detail', {model: req.query.model, result});
+app.get('/detail', (req, res, next) => {
+  // db query can use request parameters
+  Cars.findOne({ model: req.query.model }).lean().then((car) => {
+    console.log(car);
+    res.render('detail', { result: car });
+    })
+    .catch((err) => next(err));
+});
 
-// });
+app.post('/detail', (req, res, next) => {
+  Cars.findOne({ model: req.body.model }).lean().then((car) => {
+      res.render('detail', { result: car });
+    })
+    .catch((err) => next(err));
+});
 
-app.get('/detail', (req,res,next) => {
-   // db query can use request parameters
-   Cars.findOne({ model:req.query.model}).lean()
-      .then((car) => {
-         res.render('detail', {result: car} );
-   })
-      .catch(err => next(err));
-   });
-
-
-
-   app.post('/detail', (req,res, next) => {
-      Cars.findOne({ model:req.body.model }).lean()
-         .then((car) => {
-         res.render('detail', {result: car });
-         })
-         .catch(err => next(err));
-   });
-
-   app.get('/delete', (req,res) => {
-      Cars.remove({ model:req.query.model }, (err, result) => {
-      if (err) return next(err);
-      let deleted = result.result !== 0; // n will be 0 if no docs deleted
-      Cars.count((err, total) => {
-            res.type('text/plain');
-            res.render('delete', {model: req.query.model, deleted: result.result.n !== 0, total: total } );    
+app.get('/delete', (req, res) => {
+  Cars.remove({ model: req.query.model }, (err, result) => {
+    if (err) return next(err);
+    let deleted = result.result.n !== 0; // n will be 0 if no docs deleted
+    Cars.count((err, total) => {
+      res.type("text/plain");
+      res.render("delete", {
+        model: req.query.model,
+        deleted: result.result.n !== 0,
+        total: total,
       });
-      });
-   });
+    });
+  });
+});
 
+// API routes ....
+// this api  works and return all the data .. 
+app.get('/api/cars', (_req, res) => {
+  Cars.find({}).lean().then((car) => {
+    res.json(car);
+    })
+    .catch((err) => next(err));
+});
 
-   app.use((_req,res) => {
-   res.type('text/plain');
-   res.status(404);
-   res.send('404 - Not found');
-   });
+// retrun just one ite , to chekc --> /api/cars/camry or altima ... 
+app.get('/api/cars/:model', (req, res, next) => {
+  // db query can use request parameters
+  Cars.findOne({ model: req.params.model }).lean().then((car) => {
+    console.log(car);
+    res.json(car);
+    })
+    .catch((err) => next(err));
+});
 
+// to add or update one item .. 
+app.post('/api/cars', (req, res, next) => {
+  // db query can use request parameters
+  Cars.updateOne({'model': req.body.model }, req.body , {upsert:true}, (err, result) => {
+    if (err) return next(err);
+    console.log(result);
+    // other code here
+  });
+});
 
-
+app.use((_req, res) => {
+  res.type('text/plain');
+  res.status(404);
+  res.send('404 - Not found');
+});
 
 app.listen(app.get('port'), () => {
-
-   console.log('Express started');
-
+  console.log("Server 3000 started ...... ");
 });

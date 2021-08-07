@@ -5,7 +5,7 @@
   <meta charset="utf-8">
 
 <head>   
-<title>The HTML5 Herald</title>
+<title> Node.js Class </title>
   <meta name="description" content="Home Page">
   <meta name="author" content="ahmed hamad"
 
@@ -15,16 +15,20 @@
     <h1  class="home link"> <a href="/"> Home page </a></h1>
   <hr>
     <h2>Car Details </h2>
-
+ 
     {{#if result}}
         <h2> Model: {{result.model}}<h2>
         <li> Make: {{result.make}}
         <li> Year: {{result.year}}
         <li> Vin#: {{result.vin}} 
         <li> Type: {{result.type}}
+
     {{else}}
         <h2>{{model}} NOT Found </h2>
+        
     {{/if}}
+
+   {{result}}
 <hr>
 </body>
 </html> 
