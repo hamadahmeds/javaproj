@@ -13,6 +13,8 @@ import handlebars from "express-handlebars";
 // import { model } from "mongoose";
 
 
+
+
 const app = express(); // instance of express applicatoin
 app.set('port', process.env.PORT || 3000);
 app.use(express.static('./public')); // set location for static files
@@ -20,8 +22,8 @@ app.use(express.urlencoded()); //Parse URL-encoded bodiesarse URL-encoded bodies
 app.use(express.json()); /// use to submit info as a  js objects
 
 app.use(cors()); // set Access-Control-Allow-Origin header for api route
+app.use('/api', cors()); // set Access-Control-Allow-Origin header for api route
 
-app.use('/api', cors());
 
 app.engine('hbs', handlebars({ defaultLayout: 'main.hbs' }));
 app.set('view engine', 'hbs');
@@ -103,6 +105,21 @@ app.post('/api/cars', (req, res, next) => {
     // other code here
   });
 });
+
+
+
+app.post('/api/cars/add', (req, res, next) => {
+
+console.log(req.body)
+
+  // Cars.updateOne({'model': req.body.model }, req.body , {upsert:true}, (err, result) => {
+  //   if (err) return next(err);
+  //   console.log(result);
+    // other code here
+  // });
+  res.json({"massage" : "all  good "})
+});
+
 
 app.use((_req, res) => {
   res.type('text/plain');
