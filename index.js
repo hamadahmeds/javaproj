@@ -1,9 +1,9 @@
 "use strict";
 
-
+import express from 'express';
 import { Cars } from "./models/car.js";
 
-import express from "express";
+// import express, { json } from "express";
 
 // import express , { response } from "express";
 
@@ -33,7 +33,8 @@ app.set('view engine', 'hbs');
 app.get('/', (req, res, next) => {
   Cars.find({}).lean().then((car) => {
       // respond to browser only after db query completes
-      res.render("home", { car });
+      // res.render("home", { car });
+      res.render('home', {car: JSON.stringify(car)});
     })
     .catch((err) => next(err));
 });
@@ -86,8 +87,8 @@ app.get('/api/cars', (_req, res) => {
     .catch((err) => next(err));
 });
 
-// retrun just one ite , to chekc --> /api/cars/camry or altima ... 
-app.get('/api/cars/:model', (req, res, next) => {
+// retrun just one item , to chekc --> /api/cars/camry or altima ... 
+app.get('/api/car/:model', (req, res, next) => {
   // db query can use request parameters
   Cars.findOne({ model: req.params.model }).lean().then((car) => {
     console.log(car);

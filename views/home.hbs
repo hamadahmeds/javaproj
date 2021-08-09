@@ -3,26 +3,62 @@
 
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+<meta charset="utf-8">
 
 <head>   
 <title>The HTML5 Herald</title>
-  <meta name="description" content="Home Page">
-  <meta name="author" content="ahmed hamad"
+<meta name="description" content="Home Page">
+<meta name="author" content="ahmed hamad"
 
-    <link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 </head>
-    <body> 
-    <h1>Home page </h1>
-  
-    <hr> 
+<body> 
+<h1>Home page </h1>
 
-    <h2>Cars list</h2>
-    {{#each car}}
-  <li>For details :<a href="/detail?model={{model}}">{{model}} </a> </li>
-    {{/each}}
+<hr> 
+
+<h2>Cars list</h2>
+{{!-- {{#each car}}
+<li>For details :<a href="/detail?model={{model}}">{{model}} </a> </li>
+{{/each}} --}}
+
+{{!--  root is for React  use  --}}
+
+<div id="root"></div> 
 
 
+<script type="text/babel">
+
+const car = {{{car}}}
+console.log(car)
+
+
+  // click event handler
+const showDetail = (event) => {
+      // <a href={"/detail?title="+item.title}>
+      console.log(event.target)
+      console.log(event.target.innerText)
+      console.log(event.target.id)
+      window.location.href = "/detail?model=" + event.target.innerText;
+  }
+
+  /// functions starts here// 
+const Cars = (props) => {
+    // props is an array
+    console.log(props)
+    const listItems = props.data.map((item) =>
+    <li key={item._id} id={item._id} onClick={props.clickHandler}>
+        {item.model}
+    </li>);
+    return <ul>{listItems}</ul>
+}
+// crate a rdnder commands to render some React 
+ReactDOM.render(
+      <div> <Cars data={car} clickHandler={showDetail} /> </div>,
+  document.getElementById('root')
+  );
+
+</script>
 </body>
 </html> 
 
