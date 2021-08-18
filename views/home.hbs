@@ -26,37 +26,128 @@
 
 <div id="root"></div> 
 
-
 <script type="text/babel">
 
-const car = {{{car}}}
-console.log(car)
-
-
-  // click event handler
-const showDetail = (event) => {
-      // <a href={"/detail?title="+item.title}>
-      console.log(event.target)
-      console.log(event.target.innerText)
-      console.log(event.target.id)
-      window.location.href = "/detail?model=" + event.target.innerText;
-  }
-
-  /// functions starts here// 
+// return a lis of cars
 const Cars = (props) => {
-    // props is an array
-    console.log(props)
-    const listItems = props.data.map((item) =>
-    <li key={item._id} id={item._id} onClick={props.clickHandler}>
-        {item.model}
-    </li>);
-    return <ul>{listItems}</ul>
+
+const listItems = props.data.map((item) =>
+<li 
+key={item._id} id={item._id} onClick={props.clickHandler}>
+
+  {item.model} 
+
+</li>);
+return <ul>  {listItems}  </ul>
 }
+
+const ItemDetail = (props) => {
+      return(  <div>
+          <hr />
+          <h3>  Car Details </h3>
+
+        <form >
+            model :<input type="text" name="model" value= {props.item.model || ""} onChange={props.handleInputChange} required maxLength="100"/>
+            make :<input type="text" name="make" value= {props.item.make || ""} onChange={props.handleInputChange} required maxLength="100"/>
+
+            year: <input type="number"name="year" value= {props.item.year|| ""} onChange={props.handleInputChange} required maxLength="100"/>
+
+            vin: <input type="number" name="vin" value ={props.item.vin|| ""} onChange={props.handleInputChange} required maxLength="100"/>
+            type: <input type="text" name="type" value={props.item.type|| ""} onChange={props.handleInputChange } required maxLength="100"/>
+          
+        </form>
+              <button name="clear" onClick= {props.clearForm }>Clear</button>
+
+            <button>Delete</button>
+            <button onClick={props.save}>Save</button>
+
+      
+
+        </div>
+      )
+    }
+
+// reater carsapp (componetns) and constructur method 
+class CarsApp extends React.Component {
+  constructor(props) {
+  super(props);
+  this.state = {
+  items: {{{car}}}, 
+  currentItem: {}
+};
+  this.selectItem = this.selectItem.bind(this);
+  this.handleChange = this.handleChange.bind(this);
+  this.clearForm = this.clearForm.bind(this);
+  
+  this.onSave = this.onSave.bind(this);
+  this.onChange = this.onChange.bind(this);
+}
+
+// click event handler + function 
+selectItem = (event) => {
+  // <a href={"/detail?title="+item.title}>
+  console.log(event.target.innerText)
+  const found = this.state.items.find((item) => {
+    return item.model === event.target.innerText;
+});
+  this.setState({currentItem:found})
+}
+
+
+ // create a newitem then update it with the new item , then updateint the applicton state with selected a new item 
+handleChange = (event) => {
+ 
+  let newItem = this.state.currentItem;
+  newItem[event.target.name] = event.target.value;
+  this.setState({currentItem: newItem})
+}
+
+// Handle item save
+onSave() {
+  let newItem = this.state.currentItem;
+  if (!newItem.model) {
+    return;
+  }
+}
+
+
+ onChange(event) {
+        var newItem = this.state.curItem;
+        newItem[event.target.name] = event.target.value
+        this.setState({curItem: newItem});
+      }
+
+
+
+
+
+clearForm = () =>{
+    this.setState({currentItem: {} })
+}
+
+render() {
+  return(
+  <div>
+    <h2>  inventory </h2>  
+
+    <Cars data={this.state.items} clickHandler={this.selectItem} />
+
+    < ItemDetail
+       item={this.state.currentItem}
+    
+       handleChange ={this.handleChange}
+      clearForm={this.clearForm}
+      save={this.onSave}
+      change={this.onChange}/>
+
+  </div> 
+);
+}
+}
+ReactDOM.render( < CarsApp />,document.getElementById('root') );
 // crate a rdnder commands to render some React 
-ReactDOM.render(
-      <div> <Cars data={car} clickHandler={showDetail} /> </div>,
-  document.getElementById('root')
-  );
+
+
 
 </script>
 </body>

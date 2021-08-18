@@ -1,0 +1,186 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+
+<head>   
+<title>The HTML5 Herald</title>
+<meta name="description" content="Home Page">
+<meta name="author" content="ahmed hamad"
+
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body> 
+<h1>Home page </h1>
+
+<hr> 
+
+<h2>Cars list</h2>
+{{!-- {{#each car}}
+<li>For details :<a href="/detail?model={{model}}">{{model}} </a> </li>
+{{/each}} --}}
+
+{{!--  root is for React  use  --}}
+
+<div id="root"></div> 
+
+
+<script type="text/babel">
+
+{{!-- const car = {{{car}}} --}}
+{{!-- console.log(car) --}}
+/// functions starts here// 
+// return a lis of cars
+const Cars = (props) => {
+console.log(props);
+const listItems = props.data.map((item) =>
+<li key={item._id} id={item._id} onClick={props.clickHandler}>
+
+  {item.model} 
+
+</li>);
+
+return <ul>  {listItems}  </ul>
+};
+
+const Detail = (props) => {
+      return 
+        <div>
+          <hr />
+          <h3>Car Details </h3>
+          {props.item && 
+          <ul>
+            <li> model : {props.item.model}</li> 
+            <li> year : {props.item.year}</li> 
+            <li> type : {props.item.type}</li> 
+            </ul>
+          }
+        </div>
+      
+    }
+
+class CarsApp extends React.Component {
+constructor(props) {
+super(props);
+this.state = {
+items: {{{car}}}, 
+currentItem: {}
+};
+this.selectItem = this.selectItem.bind(this);
+}
+
+// click event handler
+selectItem = (event) => {
+  // <a href={"/detail?title="+item.title}>
+  console.log(event.target.innerText);
+  const found = this.state.items.find((item) => {
+  return item.model === event.target.innerText;
+});
+  this.setState({currentItem:found})
+
+  {{!-- window.location.href = "/detail?model=" + event.target.innerText; --}}
+};
+
+render() {
+return (
+  
+    <div>
+      <h2>inventory </h2>  
+      
+      <Cars data={this.state.items} clickHandler={selectItem} /> 
+      <Detail item ={this.state.currentItem} />
+    
+    </div> )
+}
+}
+ReactDOM.render(  < CarsApp />,  document.getElementById('root') );
+// crate a rdnder commands to render some React 
+{{!-- ReactDOM.render(
+  <div> <Cars data={car} clickHandler={showDetail} /> 
+    <hr />
+  </div>,
+document.getElementById('root')
+); --}}
+
+</script>
+
+
+<h2>Home</h2>
+<form method="POST" action="/search">
+    title :<input type="text" name="model" placeholder="company" required maxlength="100">
+   year: <input type="text" name="year" placeholder="contact" maxlength="100">
+   vin: <input type="date" name="vin" placeholder="close" maxlength="100">
+    type :<input type="text" name="type" placeholder="amount" maxlength="100">
+    <button>Search</button>
+    <button>Add</button>
+    <button>Delete</button>
+</form>
+
+
+
+<h2>Home</h2>
+<form >
+    title :<input type="text" name="model" value= {props.item.model}  onChange={props.handleInputChange} required maxlength="100">
+   year: <input type="text" name="year" value= {props.item.year} placeholder="contact" maxlength="100">
+   vin: <input type="date" name="vin" value ={props.item.vin} placeholder="close" maxlength="100">
+    type :<input type="text" name="type" value={props.item.type}  placeholder="amount" maxlength="100">
+    <button>Search</button>
+    <button>Add</button>
+    <button>Delete</button>
+</form>
+
+
+
+
+
+
+const Detail = (props) => {
+      return 
+        <div>
+          <hr />
+          <h3>Car Details </h3>
+          {props.item && 
+          <ul>
+            <li> model : {props.item.model}</li> 
+            <li> year : {props.item.year}</li> 
+            <li> type : {props.item.type}</li> 
+            </ul>
+          }
+        </div>
+      
+    }
+
+
+
+
+
+
+
+</body>
+
+<script>
+    $(document).ready(function(){
+        var buttons = $('button');
+        
+        buttons.on('click', function() {
+            var $this = $(this);
+            $("form").attr("action", $this.text().toLowerCase());
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html> 
+
