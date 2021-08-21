@@ -1,7 +1,7 @@
 
 <!doctype html>
 
-<html lang="en">
+<html lang="en"></html>
 <head>
 <meta charset="utf-8">
 
@@ -53,13 +53,15 @@ const ItemDetail = (props) => {
             year: <input type="number"name="year" value= {props.item.year|| ""} onChange={props.handleInputChange} required maxLength="100"/>
 
             vin: <input type="number" name="vin" value ={props.item.vin|| ""} onChange={props.handleInputChange} required maxLength="100"/>
-            type: <input type="text" name="type" value={props.item.type|| ""} onChange={props.handleInputChange } required maxLength="100"/>
+            type: <input type="text" name="type" value={props.item.type|| ""} onChange={props.handleInputChange} required maxLength="100"/>
           
         </form>
               <button name="clear" onClick= {props.clearForm }>Clear</button>
 
-            <button>Delete</button>
-            <button onClick={props.save}>Save</button>
+          <button onClick={props.delete}>Delete</button>
+
+          <button onClick={props.save}>Save</button>
+          <button onClick={props.reset}>Reset</button>
 
       
 
@@ -76,11 +78,12 @@ class CarsApp extends React.Component {
   currentItem: {}
 };
   this.selectItem = this.selectItem.bind(this);
-  this.handleChange = this.handleChange.bind(this);
+  this.handleInputChange = this.handleInputChange.bind(this);
   this.clearForm = this.clearForm.bind(this);
   
   this.onSave = this.onSave.bind(this);
   this.onChange = this.onChange.bind(this);
+   this.onDelete = this.onDelete.bind(this);
 }
 
 // click event handler + function 
@@ -95,8 +98,7 @@ selectItem = (event) => {
 
 
  // create a newitem then update it with the new item , then updateint the applicton state with selected a new item 
-handleChange = (event) => {
- 
+handleInputChange = (event) => {
   let newItem = this.state.currentItem;
   newItem[event.target.name] = event.target.value;
   this.setState({currentItem: newItem})
@@ -109,36 +111,80 @@ onSave() {
     return;
   }
 }
+ fetch("/api/v1/add/", { method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newItem)
+      }).then(res => res.json())
+        .then((json) => {
+        let newData;
+        if (!newItem._id) { // add new item to array
+          newData = this.state.items;
+          newItem._id = json._id;
+          newData.push(newItem);
+        } else { // update existing item 
+          newData = this.state.items.map((item) => {
+            if (item._id === newItem._id) {
+              item = newItem; 
+            }
+            return item;
+          });          
+        }
+
+        // Update state with new array
+        this.setState({items: newData});
+      });
+    }
+    
+
 
 
  onChange(event) {
-        var newItem = this.state.curItem;
+        var newItem = this.state.currentItem;
         newItem[event.target.name] = event.target.value
-        this.setState({curItem: newItem});
+        this.setState({currentItem: newItem});
       }
-
-
-
 
 
 clearForm = () =>{
     this.setState({currentItem: {} })
 }
 
+
+
+onDelete(){
+        let id = this.state.currentItem._id;
+        
+        fetch("/api/v1/delete/" + id).then((response) => {
+          return response.json();
+        }).then((results) => {
+          // Filter all items except the one to be removed
+          const remainder = this.state.items.filter((item) => {
+            return item._id !== id;
+        });
+          // Update state with new array
+          this.setState({items: remainder, currentItem: {} });
+        });
+      }
+
+
+
+
 render() {
   return(
   <div>
-    <h2>  inventory </h2>  
+    <h2>Inventory</h2>  
 
     <Cars data={this.state.items} clickHandler={this.selectItem} />
 
     < ItemDetail
        item={this.state.currentItem}
     
-       handleChange ={this.handleChange}
+      handleInputChange ={this.handleInputChange}
       clearForm={this.clearForm}
-      save={this.onSave}
-      change={this.onChange}/>
+      onSave={this.onSave}
+      onChange={this.onChange}
+      reset={this.onClear}
+      delete={this.onDelete}/>
 
   </div> 
 );
